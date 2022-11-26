@@ -1,0 +1,28 @@
+import json
+import java.io
+from org.apache.commons.io import IOUtils
+from java.nio.charset import StandardCharsets
+from org.apache.nifi.processor.io import StreamCallback
+from datetime import datetime
+import csv 
+
+now = datetime.now()
+minutes = now.minutes
+last_forecast_row = minutes+60*24*7
+
+class PyStreamCallback(StreamCallback):
+  def __init__(self):
+        pass
+  def process(self, inputStream, outputStream):
+    text = IOUtils.readLines(inputStream, StandardCharsets.UTF_8)
+    outputStream.write(text[0] + "\n")
+    for line in text[minutes:last_forecast_row-1]:
+        outputStream.write(line + "\n")
+    outputStream.write(text[last_forecast_row])
+
+
+flowFile = session.get()
+if (flowFile != None):
+  flowFile = session.write(flowFile,PyStreamCallback())
+  flowFile = session.putAttribute(flowFile, "filename", 'forecast_7days.csv')
+  session.transfer(flowFile, REL_SUCCESS)
