@@ -4,10 +4,7 @@
 #     except ImportError:
 #         pip.main(["install", package])
 
-# import_or_install("time")
-# import_or_install("pandas")
-# import_or_install("http.client")
-# import_or_install("io")
+import datetime
 import sys
 import time
 import pandas as pd
@@ -47,5 +44,8 @@ df2["Resolved Address"] = df2.Name[0]
 df2["Name"] = df2.Name[0]
 
 # we're taking 10 days of a forecast
-df3 = df2.iloc[:60*24*10, :]
+# starting from current minute
+now = datetime.datetime.now()
+minutes = now.minute
+df3 = df2.iloc[minutes-1:60*24*10, :]
 df3.to_csv(sys.stdout, index=False)
